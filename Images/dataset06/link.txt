@@ -1,0 +1,6 @@
+LRDE Document Binarization Dataset (LRDE DBD)
+
+https://www.lrde.epita.fr/wiki/Olena/DatasetDBD
+
+First image from:
+https://www.lrde.epita.fr/dload/olena/datasets/dbd/1.0/outputs/bin_otsu_clean.zip
