@@ -1,79 +1,132 @@
 #include <iostream>
 #include <fstream>
 #include <array_stack.h>
+#include <array_list.h>
+#include <image.h>
 
-// v0.1
+// v0.2
 
 int main() {
 
     char xmlFileName[100];
 
-    std::cin >> xmlFileName;  // entrada
-
     std::ifstream xmlFileStream;
-    std::string xmlFile;
-    std::string line;
 
-    xmlFileStream.open(xmlFileName);
-    
-    while (getline(xmlFileStream, line)) {
-        xmlFile.append(line);
-    }
-
-    std::string tag;
     structures::ArrayStack<std::string> tags;
+    structures::ArrayList<structures::CharImage*> charImages;
 
-    bool readingTag = false;
-    bool openingTag = false;
-    bool tagIsFree = true;
-    bool valid = true;
+    bool dataIsValid = true;
 
-    for (int i = 0; i < xmlFile.length(); ++i) {
+    std::cin >> xmlFileName;  // entrada
+    xmlFileStream.open(xmlFileName);
 
-        if (xmlFile[i] == '<') {
-            readingTag = true;
-            tagIsFree = false;
+    if (xmlFileStream.is_open()) {
 
-            if (xmlFile[i + 1] == '/') {
-                openingTag = false;
-                i += 2;
-            } else {
-                openingTag = true;
-                ++i;
-            }
-        } else if (xmlFile[i] == '>') {
-            readingTag = false;
+        std::string xmlFile;
+        std::string line;
+        std::string tag;
+        std::string data;
+        std::string imgName;
+        std::string imgData;
+
+        unsigned int imgWidth;
+        unsigned int imgHeight;
+
+        int obtainedData = 0;
+
+        bool readingTag = false;
+        bool openingTag = false;
+        bool readingData = false;
+
+        while (getline(xmlFileStream, line)) {
+            xmlFile.append(line);
         }
 
-        if (readingTag) {
-            tag.push_back(xmlFile[i]);
-        } else if (!tagIsFree) {
-
-            if (openingTag) {
-                tags.push(tag);
-            } else {
-                if (tags.top() == tag) {
-                    tags.pop();
+        for (std::size_t i = 0; i < xmlFile.length(); ++i) {
+            if (readingData) {
+                if (xmlFile[i + 1] != '<') {
+                    data.push_back(xmlFile[i]);
                 } else {
-                    valid = false;
+                    readingData = false;
+                }
+            } else {
+                switch (xmlFile[i])
+                {
+                case '<':
+                    readingTag = true;
+                    openingTag = true;
+
+                    if (tags.empty()) {
+                        break;
+                    }
+
+                    if (tags.top() == "name") {
+                        imgName = data;
+                    } else if (tags.top() == "width") {
+                        imgWidth = std::stoi(data);
+                    } else if (tags.top() == "height") {
+                        imgHeight = std::stoi(data);
+                    } else if (tags.top() == "data") {
+                        imgData = data;
+                    } else {
+                        break;
+                    }
+
+                    if (++obtainedData == 4) {
+                        structures::CharImage* charImage;
+                        charImage = new structures::CharImage(imgName,
+                                                                imgWidth,
+                                                                imgHeight);
+                        charImage->set_image(imgData);
+
+                        charImages.push_back(charImage);
+
+                        obtainedData = 0;
+                    }
+                    data.clear();
+                    break;
+                case '>':
+                    if (openingTag) {
+                        tags.push(tag);
+                        readingData = true;
+                    } else {
+                        if (tags.top() == tag) {
+                            tags.pop();
+                        } else {
+                            dataIsValid = false;
+                        }
+                    }
+
+                    readingTag = false;
+                    openingTag = false;
+                    tag.clear();
+                    break;
+                case '/':
+                    openingTag = false;
+                    break;
+                default:
+                    if (readingTag) {
+                        tag.push_back(xmlFile[i]);
+                    }
                     break;
                 }
             }
-            tag.clear();
-            tagIsFree = true;
+
+            std::cout << xmlFile[i] << ", " << openingTag << ", " << dataIsValid << std::endl;
         }
+    } else {
+        dataIsValid = false;
     }
 
     if (!tags.empty()) {
-        valid = false;
+        dataIsValid = false;
     }
 
-    // for (int i = 0; i < tags.size(); ++i) {
-    //     std::cout << tags.pop() << std::endl;
-    // }
+    if (dataIsValid) {
 
-    if (valid) {
+        // Fazer as outras operações
         std::cout << "ok" << std::endl;
+
     } else {
         std::cout << "error" << std::endl;
     }

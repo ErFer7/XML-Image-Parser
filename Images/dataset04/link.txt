@@ -1,5 +1,0 @@
-COMPUTATIONAL VISION AT CALTECH
-Home Objects dataset
-
-Training images:
-http://www.vision.caltech.edu/pmoreels/Datasets/Home_Objects_06/
