@@ -17,32 +17,32 @@ namespace structures
         unsigned int get_height();
 
     private:
-        std::string name;
-        unsigned int width;
-        unsigned int height;
-        char *contents;
+        std::string _name;
+        unsigned int _width;
+        unsigned int _height;
+        char *_contents;
     };
 
 } // namespace structures
 
 structures::CharImage::CharImage(std::string name, unsigned int width, unsigned int height)
 {
-    name = name;
-    width = width;
-    height = height;
-    contents = new char[width * height];
+    _name = name;
+    _width = width;
+    _height = height;
+    _contents = new char[width * height];
 }
 
 structures::CharImage::~CharImage()
 {
-    delete[] contents;
+    delete[] _contents;
 }
 
 void structures::CharImage::set_image(const std::string &image)
 {
-    if (image.length() != width * height) {
+    if (image.length() == _width * _height) {
         for (std::size_t i = 0; i < image.length(); ++i) {
-            contents[i] = image[i];
+            _contents[i] = image[i];
         }
     } else {
         throw std::out_of_range("Invalid image size");
@@ -51,8 +51,8 @@ void structures::CharImage::set_image(const std::string &image)
 
 void structures::CharImage::set_pixel(unsigned int x, unsigned int y, const char &pixel)
 {
-    if ((x >= 0 && x < width) && (y >= 0 && y < height)) {
-        contents[y * width + x] = pixel;
+    if ((x >= 0 && x < _width) && (y >= 0 && y < _height)) {
+        _contents[y * _width + x] = pixel;
     } else {
         throw std::out_of_range("Invalid pixel position");
     }
@@ -60,8 +60,8 @@ void structures::CharImage::set_pixel(unsigned int x, unsigned int y, const char
 
 char structures::CharImage::get_pixel(unsigned int x, unsigned int y)
 {
-    if ((x >= 0 && x < width) && (y >= 0 && y < height)) {
-        return contents[y * width + x];
+    if ((x >= 0 && x < _width) && (y >= 0 && y < _height)) {
+        return _contents[y * _width + x];
     } else {
         throw std::out_of_range("Invalid pixel position");
     }
@@ -69,15 +69,15 @@ char structures::CharImage::get_pixel(unsigned int x, unsigned int y)
 
 std::string structures::CharImage::get_name()
 {
-    return name;
+    return _name;
 }
 
 unsigned int structures::CharImage::get_width()
 {
-    return width;
+    return _width;
 }
 
 unsigned int structures::CharImage::get_height()
 {
-    return height;
+    return _height;
 }

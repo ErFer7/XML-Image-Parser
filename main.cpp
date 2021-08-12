@@ -4,13 +4,13 @@
 #include <array_list.h>
 #include <image.h>
 
-// v0.2
+// v0.3
 
 int main() {
 
     char xmlFileName[100];
 
-    std::ifstream xmlFileStream;
+    std::ifstream xmlFile;
 
     structures::ArrayStack<std::string> tags;
     structures::ArrayList<structures::CharImage*> charImages;
@@ -18,11 +18,10 @@ int main() {
     bool dataIsValid = true;
 
     std::cin >> xmlFileName;  // entrada
-    xmlFileStream.open(xmlFileName);
+    xmlFile.open(xmlFileName);
 
-    if (xmlFileStream.is_open()) {
+    if (xmlFile.is_open()) {
 
-        std::string xmlFile;
         std::string line;
         std::string tag;
         std::string data;
@@ -36,83 +35,71 @@ int main() {
 
         bool readingTag = false;
         bool openingTag = false;
-        bool readingData = false;
 
-        while (getline(xmlFileStream, line)) {
-            xmlFile.append(line);
-        }
+        char c;
 
-        for (std::size_t i = 0; i < xmlFile.length(); ++i) {
-            if (readingData) {
-                if (xmlFile[i + 1] != '<') {
-                    data.push_back(xmlFile[i]);
+        while(xmlFile.get(c)) {
+            switch (c)
+            {
+            case '<':
+                readingTag = true;
+                openingTag = true;
+
+                if (tags.empty()) {
+                    break;
+                }
+
+                if (tags.top() == "name") {
+                    imgName = data;
+                } else if (tags.top() == "width") {
+                    imgWidth = std::stoi(data);
+                } else if (tags.top() == "height") {
+                    imgHeight = std::stoi(data);
+                } else if (tags.top() == "data") {
+                    imgData = data;
                 } else {
-                    readingData = false;
-                }
-            } else {
-                switch (xmlFile[i])
-                {
-                case '<':
-                    readingTag = true;
-                    openingTag = true;
-
-                    if (tags.empty()) {
-                        break;
-                    }
-
-                    if (tags.top() == "name") {
-                        imgName = data;
-                    } else if (tags.top() == "width") {
-                        imgWidth = std::stoi(data);
-                    } else if (tags.top() == "height") {
-                        imgHeight = std::stoi(data);
-                    } else if (tags.top() == "data") {
-                        imgData = data;
-                    } else {
-                        break;
-                    }
-
-                    if (++obtainedData == 4) {
-                        structures::CharImage* charImage;
-                        charImage = new structures::CharImage(imgName,
-                                                                imgWidth,
-                                                                imgHeight);
-                        charImage->set_image(imgData);
-
-                        charImages.push_back(charImage);
-
-                        obtainedData = 0;
-                    }
-                    data.clear();
-                    break;
-                case '>':
-                    if (openingTag) {
-                        tags.push(tag);
-                        readingData = true;
-                    } else {
-                        if (tags.top() == tag) {
-                            tags.pop();
-                        } else {
-                            dataIsValid = false;
-                        }
-                    }
-
-                    readingTag = false;
-                    openingTag = false;
-                    tag.clear();
-                    break;
-                case '/':
-                    openingTag = false;
-                    break;
-                default:
-                    if (readingTag) {
-                        tag.push_back(xmlFile[i]);
-                    }
                     break;
                 }
+
+                if (++obtainedData == 4) {
+                    structures::CharImage* charImage;
+                    charImage = new structures::CharImage(imgName,
+                                                            imgWidth,
+                                                            imgHeight);
+                    charImage->set_image(imgData);
+
+                    charImages.push_back(charImage);
+
+                    obtainedData = 0;
+                }
+                data.clear();
+                break;
+            case '>':
+                if (openingTag) {
+                    tags.push(tag);
+                } else {
+                    if (tags.top() == tag) {
+                        tags.pop();
+                    } else {
+                        dataIsValid = false;
+                    }
+                }
+
+                readingTag = false;
+                openingTag = false;
+                tag.clear();
+                break;
+            case '/':
+                openingTag = false;
+                break;
+            default:
+                if (readingTag) {
+                    tag.push_back(c);
+                } else {
+                    data.push_back(c);
+                }
+                break;
             }
-
-            std::cout << xmlFile[i] << ", " << openingTag << ", " << dataIsValid << std::endl;
         }
     } else {
         dataIsValid = false;
@@ -127,6 +114,18 @@ int main() {
         // Fazer as outras operações
         std::cout << "ok" << std::endl;
 
+        for (int i = 0; i < charImages.size(); ++i) {
+            std::cout << charImages[i]->get_name() << std::endl;
+            std::cout << charImages[i]->get_width() << std::endl;
+            std::cout << charImages[i]->get_height() << std::endl;
+
+            for (int j = 0; j < charImages[i]->get_height(); ++j) {
+                for (int k = 0; k < charImages[i]->get_width(); ++k) {
+                    std::cout << charImages[i]->get_pixel(k, j);
+                }
+                std::cout << std::endl;
+            }
+        }
     } else {
         std::cout << "error" << std::endl;
     }
