@@ -2,15 +2,15 @@
 #ifndef STRUCTURES_ARRAY_LIST_H
 #define STRUCTURES_ARRAY_LIST_H
 
+#include <stdexcept>
 #include <cstdint>
-
 
 namespace structures {
 
-template<typename T>
+template <typename T>
 //  Classe ArrayList
 class ArrayList {
- public:
+   public:
     // Construtor padrão
     ArrayList();
     // Construtor com parâmetro
@@ -58,9 +58,9 @@ class ArrayList {
     const T& operator[](std::size_t index) const;
     // descricao do 'operator []' na FAQ da disciplina
 
- private:
-    T* contents;  // Dados
-    std::size_t size_;  // Tamanho
+   private:
+    T* contents;            // Dados
+    std::size_t size_;      // Tamanho
     std::size_t max_size_;  // Tamanho máximo
 
     static const auto DEFAULT_MAX = 10u;
@@ -72,21 +72,21 @@ class ArrayList {
 
 template <typename T>
 structures::ArrayList<T>::ArrayList() {
-    max_size_ = DEFAULT_MAX;  // Inicializa o tamanho máximo
+    max_size_ = DEFAULT_MAX;      // Inicializa o tamanho máximo
     contents = new T[max_size_];  // Inicializa a array
-    size_ = 0;  // Inicializa o tamanho
+    size_ = 0;                    // Inicializa o tamanho
 }
 
 template <typename T>
 structures::ArrayList<T>::ArrayList(std::size_t max_size) {
-    max_size_ = max_size;  // Inicializa o tamanho máximo
+    max_size_ = max_size;         // Inicializa o tamanho máximo
     contents = new T[max_size_];  // Inicializa a array
-    size_ = 0;  // Inicializa o tamanho
+    size_ = 0;                    // Inicializa o tamanho
 }
 
 template <typename T>
 structures::ArrayList<T>::~ArrayList() {
-	delete[] contents;  // Apaga a array de conteúdo
+    delete[] contents;  // Apaga a array de conteúdo
 }
 
 template <typename T>
@@ -259,22 +259,14 @@ template <typename T>
 bool structures::ArrayList<T>::full() const {
     // Verifica se a lista está cheia
 
-    if (size() == max_size()) {
-        return true;
-    } else {
-        return false;
-    }
+    return size() == max_size();
 }
 
 template <typename T>
 bool structures::ArrayList<T>::empty() const {
     // Verifica se a lista está vazia
 
-    if (size() == 0) {
-        return true;
-    } else {
-        return false;
-    }
+    return size() == 0;
 }
 
 template <typename T>
@@ -283,7 +275,7 @@ bool structures::ArrayList<T>::contains(const T& data) const {
 
     bool dataFound = false;  // Variável para armazenar o estado do dado
 
-    if (!empty()) {  // Caso a lista não esteja vazia
+    if (!empty()) {                      // Caso a lista não esteja vazia
         std::size_t index = find(data);  // Procura o dado e obtém o seu índice
 
         // Caso o íncide corresponda ao dado isso significa que ele está na
