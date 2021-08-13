@@ -68,8 +68,6 @@ class ArrayList {
 
 }  // namespace structures
 
-#endif
-
 template <typename T>
 structures::ArrayList<T>::ArrayList() {
     max_size_ = DEFAULT_MAX;      // Inicializa o tamanho máximo
@@ -358,3 +356,5 @@ const T& structures::ArrayList<T>::operator[](std::size_t index) const {
     // Retorna o dado na posição de forma constante (apenas leitura)
     return contents[index];
 }
+
+#endif

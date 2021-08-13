@@ -2,19 +2,29 @@
 #include <array_queue.h>
 #include <array_stack.h>
 #include <image.h>
+#include <matrix.h>
 
 #include <fstream>
 #include <iostream>
 
-// v0.4
+using std::cout;
+using std::endl;
+using std::string;
+using structures::ArrayList;
+using structures::ArrayQueue;
+using structures::ArrayStack;
+using structures::CharImage;
+using structures::Matrix;
+
+// v0.5
 
 int main() {
     char xmlFileName[100];
 
     std::ifstream xmlFile;
 
-    structures::ArrayStack<std::string> tags;
-    structures::ArrayList<structures::CharImage*> charImages;
+    ArrayStack<string> tags;
+    ArrayList<CharImage*> charImages(200);
 
     bool dataIsValid = true;
 
@@ -22,14 +32,14 @@ int main() {
     xmlFile.open(xmlFileName);
 
     if (xmlFile.is_open()) {
-        std::string line;
-        std::string tag;
-        std::string data;
-        std::string imgName;
-        std::string imgData;
+        string line;
+        string tag;
+        string data;
+        string imgName;
+        string imgData;
 
-        unsigned int imgWidth;
-        unsigned int imgHeight;
+        int imgWidth;
+        int imgHeight;
 
         int obtainedData = 0;
 
@@ -51,9 +61,19 @@ int main() {
                     if (tags.top() == "name") {
                         imgName = data;
                     } else if (tags.top() == "width") {
-                        imgWidth = std::stoi(data);
+                        try {
+                            imgWidth = std::stoi(data);
+                        } catch (const std::invalid_argument& e) {
+                            dataIsValid = false;
+                            break;
+                        }
                     } else if (tags.top() == "height") {
-                        imgHeight = std::stoi(data);
+                        try {
+                            imgHeight = std::stoi(data);
+                        } catch (const std::invalid_argument& e) {
+                            dataIsValid = false;
+                            break;
+                        }
                     } else if (tags.top() == "data") {
                         imgData = data;
                     } else {
@@ -61,7 +81,7 @@ int main() {
                     }
 
                     if (++obtainedData == 4) {
-                        structures::CharImage* charImage;
+                        CharImage* charImage;
                         charImage = new structures::CharImage(imgName, imgWidth, imgHeight);
                         charImage->set_image(imgData);
 
@@ -111,74 +131,76 @@ int main() {
     if (dataIsValid) {
         for (std::size_t i = 0; i < charImages.size(); ++i) {
             int label = 0;
-            int matrix[charImages[i]->height()][charImages[i]->width()];
-            structures::ArrayQueue<unsigned int*> queue(charImages[i]->length());
+            Matrix<int> matrix(charImages[i]->width(), charImages[i]->height());
+            ArrayQueue<int*> queue(charImages[i]->length());
 
-            for (unsigned int j = 0; j < charImages[i]->height(); ++j) {
-                for (unsigned int k = 0; k < charImages[i]->width(); ++k) {
-                    matrix[j][k] = 0;
+            for (int j = 0; j < charImages[i]->height(); ++j) {
+                for (int k = 0; k < charImages[i]->width(); ++k) {
+                    matrix.set_data(k, j, 0);
                 }
             }
 
-            for (unsigned int j = 0; j < charImages[i]->height(); ++j) {
-                for (unsigned int k = 0; k < charImages[i]->width(); ++k) {
-                    if (matrix[j][k] == 0 && charImages[i]->get_char(k, j) == '1') {
-                        unsigned int* position = new unsigned int[2];
+            for (int j = 0; j < charImages[i]->height(); ++j) {
+                for (int k = 0; k < charImages[i]->width(); ++k) {
+                    if (matrix.get_data(k, j) == 0 && charImages[i]->get_char(k, j) == '1') {
+                        int* position = new int[2];
                         position[0] = j;
                         position[1] = k;
                         queue.enqueue(position);
-                        matrix[j][k] = ++label;
+                        matrix.set_data(k, j, ++label);
                     }
 
                     while (!queue.empty()) {
-                        unsigned int* position = queue.dequeue();
+                        int* position = queue.dequeue();
 
-                        if (position[1] - 1 >= 0 &&
-                            charImages[i]->get_char(position[1] - 1, position[0]) == '1' &&
-                            matrix[position[0]][position[1] - 1] == 0) {
-                            unsigned int* left = new unsigned int[2];
-                            left[0] = position[0];
-                            left[1] = position[1] - 1;
+                        if (position[1] - 1 >= 0) {
+                            if (charImages[i]->get_char(position[1] - 1, position[0]) == '1' &&
+                                matrix.get_data(position[1] - 1, position[0]) == 0) {
+                                int* left = new int[2];
+                                left[0] = position[0];
+                                left[1] = position[1] - 1;
 
-                            queue.enqueue(left);
-
-                            matrix[position[0]][position[1] - 1] = label;
+                                queue.enqueue(left);
+                                matrix.set_data(position[1] - 1, position[0], label);
+                            }
                         }
 
-                        if (position[1] + 1 < charImages[i]->width() &&
-                            charImages[i]->get_char(position[1] + 1, position[0]) == '1' &&
-                            matrix[position[0]][position[1] + 1] == 0) {
-                            unsigned int* right = new unsigned int[2];
-                            right[0] = position[0];
-                            right[1] = position[1] + 1;
+                        if (position[1] + 1 < charImages[i]->width()) {
+                            if (charImages[i]->get_char(position[1] + 1, position[0]) == '1' &&
+                                matrix.get_data(position[1] + 1, position[0]) == 0) {
+                                int* right = new int[2];
+                                right[0] = position[0];
+                                right[1] = position[1] + 1;
 
-                            queue.enqueue(right);
-
-                            matrix[position[0]][position[1] + 1] = label;
+                                queue.enqueue(right);
+                                matrix.set_data(position[1] + 1, position[0], label);
+                            }
                         }
 
-                        if (position[0] - 1 >= 0 &&
-                            charImages[i]->get_char(position[1], position[0] - 1) == '1' &&
-                            matrix[position[0] - 1][position[1]] == 0) {
-                            unsigned int* up = new unsigned int[2];
-                            up[0] = position[0] - 1;
-                            up[1] = position[1];
+                        if (position[0] - 1 >= 0) {
+                            if (charImages[i]->get_char(position[1], position[0] - 1) == '1' &&
+                                matrix.get_data(position[1], position[0] - 1) == 0) {
+                                int* up = new int[2];
+                                up[0] = position[0] - 1;
+                                up[1] = position[1];
 
-                            queue.enqueue(up);
+                                queue.enqueue(up);
 
-                            matrix[position[0] - 1][position[1]] = label;
+                                matrix.set_data(position[1], position[0] - 1, label);
+                            }
                         }
 
-                        if (position[0] + 1 < charImages[i]->height() &&
-                            charImages[i]->get_char(position[1], position[0] + 1) == '1' &&
-                            matrix[position[0] + 1][position[1]] == 0) {
-                            unsigned int* down = new unsigned int[2];
-                            down[0] = position[0] + 1;
-                            down[1] = position[1];
+                        if (position[0] + 1 < charImages[i]->height()) {
+                            if (charImages[i]->get_char(position[1], position[0] + 1) == '1' &&
+                                matrix.get_data(position[1], position[0] + 1) == 0) {
+                                int* down = new int[2];
+                                down[0] = position[0] + 1;
+                                down[1] = position[1];
 
-                            queue.enqueue(down);
+                                queue.enqueue(down);
 
-                            matrix[position[0] + 1][position[1]] = label;
+                                matrix.set_data(position[1], position[0] + 1, label);
+                            }
                         }
 
                         delete position;
@@ -186,10 +208,10 @@ int main() {
                 }
             }
 
-            std::cout << charImages[i]->name() << " " << label << std::endl;
+            cout << charImages[i]->name() << " " << label << endl;
         }
     } else {
-        std::cout << "error" << std::endl;
+        cout << "error" << endl;
     }
 
     return 0;

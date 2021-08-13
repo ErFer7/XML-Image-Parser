@@ -45,8 +45,6 @@ class ArrayQueue {
 
 }  // namespace structures
 
-#endif
-
 template <typename T>
 structures::ArrayQueue<T>::ArrayQueue() {
     max_size_ = DEFAULT_SIZE;     // Inicializa o tamanho com o tamanho padrão
@@ -136,3 +134,5 @@ bool structures::ArrayQueue<T>::full() {
     // Retorna verdadeiro quando o tamanho for igual ao máximo
     return size_ == max_size();
 }
+
+#endif

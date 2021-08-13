@@ -44,8 +44,6 @@ class ArrayStack {
 
 }  // namespace structures
 
-#endif
-
 template <typename T>
 structures::ArrayStack<T>::ArrayStack() {
     max_size_ = DEFAULT_SIZE;
@@ -118,3 +116,5 @@ template <typename T>
 bool structures::ArrayStack<T>::full() {
     return top_ == static_cast<int>(max_size() - 1);
 }
+
+#endif
