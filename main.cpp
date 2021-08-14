@@ -1,7 +1,8 @@
-#include <array_list.h>
-#include <array_queue.h>
+// Copyright [2021] <Eric Fernandes Evaristo>
+
 #include <array_stack.h>
 #include <image.h>
+#include <linked_queue.h>
 #include <matrix.h>
 
 #include <fstream>
@@ -10,25 +11,27 @@
 using std::cout;
 using std::endl;
 using std::string;
-using structures::ArrayList;
-using structures::ArrayQueue;
 using structures::ArrayStack;
 using structures::CharImage;
+using structures::LinkedQueue;
 using structures::Matrix;
 
-// v0.5
+#define STACK_SIZE 10
+
+// v0.6
 
 int main() {
     char xmlFileName[100];
 
     std::ifstream xmlFile;
 
-    ArrayStack<string> tags;
-    ArrayList<CharImage*> charImages(200);
+    ArrayStack<string> tags(STACK_SIZE);
+    LinkedQueue<CharImage*> charImages;
 
     bool dataIsValid = true;
 
     std::cin >> xmlFileName;  // entrada
+
     xmlFile.open(xmlFileName);
 
     if (xmlFile.is_open()) {
@@ -85,7 +88,7 @@ int main() {
                         charImage = new structures::CharImage(imgName, imgWidth, imgHeight);
                         charImage->set_image(imgData);
 
-                        charImages.push_back(charImage);
+                        charImages.enqueue(charImage);
 
                         obtainedData = 0;
                     }
@@ -129,20 +132,21 @@ int main() {
     }
 
     if (dataIsValid) {
-        for (std::size_t i = 0; i < charImages.size(); ++i) {
+        while (charImages.size() > 0) {
+            CharImage* charImage = charImages.dequeue();
             int label = 0;
-            Matrix<int> matrix(charImages[i]->width(), charImages[i]->height());
-            ArrayQueue<int*> queue(charImages[i]->length());
+            Matrix<int> matrix(charImage->width(), charImage->height());
+            LinkedQueue<int*> queue;
 
-            for (int j = 0; j < charImages[i]->height(); ++j) {
-                for (int k = 0; k < charImages[i]->width(); ++k) {
+            for (int j = 0; j < charImage->height(); ++j) {
+                for (int k = 0; k < charImage->width(); ++k) {
                     matrix.set_data(k, j, 0);
                 }
             }
 
-            for (int j = 0; j < charImages[i]->height(); ++j) {
-                for (int k = 0; k < charImages[i]->width(); ++k) {
-                    if (matrix.get_data(k, j) == 0 && charImages[i]->get_char(k, j) == '1') {
+            for (int j = 0; j < charImage->height(); ++j) {
+                for (int k = 0; k < charImage->width(); ++k) {
+                    if (matrix.get_data(k, j) == 0 && charImage->get_char(k, j) == '1') {
                         int* position = new int[2];
                         position[0] = j;
                         position[1] = k;
@@ -154,7 +158,7 @@ int main() {
                         int* position = queue.dequeue();
 
                         if (position[1] - 1 >= 0) {
-                            if (charImages[i]->get_char(position[1] - 1, position[0]) == '1' &&
+                            if (charImage->get_char(position[1] - 1, position[0]) == '1' &&
                                 matrix.get_data(position[1] - 1, position[0]) == 0) {
                                 int* left = new int[2];
                                 left[0] = position[0];
@@ -165,8 +169,8 @@ int main() {
                             }
                         }
 
-                        if (position[1] + 1 < charImages[i]->width()) {
-                            if (charImages[i]->get_char(position[1] + 1, position[0]) == '1' &&
+                        if (position[1] + 1 < charImage->width()) {
+                            if (charImage->get_char(position[1] + 1, position[0]) == '1' &&
                                 matrix.get_data(position[1] + 1, position[0]) == 0) {
                                 int* right = new int[2];
                                 right[0] = position[0];
@@ -178,7 +182,7 @@ int main() {
                         }
 
                         if (position[0] - 1 >= 0) {
-                            if (charImages[i]->get_char(position[1], position[0] - 1) == '1' &&
+                            if (charImage->get_char(position[1], position[0] - 1) == '1' &&
                                 matrix.get_data(position[1], position[0] - 1) == 0) {
                                 int* up = new int[2];
                                 up[0] = position[0] - 1;
@@ -190,8 +194,8 @@ int main() {
                             }
                         }
 
-                        if (position[0] + 1 < charImages[i]->height()) {
-                            if (charImages[i]->get_char(position[1], position[0] + 1) == '1' &&
+                        if (position[0] + 1 < charImage->height()) {
+                            if (charImage->get_char(position[1], position[0] + 1) == '1' &&
                                 matrix.get_data(position[1], position[0] + 1) == 0) {
                                 int* down = new int[2];
                                 down[0] = position[0] + 1;
@@ -208,7 +212,8 @@ int main() {
                 }
             }
 
-            cout << charImages[i]->name() << " " << label << endl;
+            cout << charImage->name() << " " << label << endl;
+            delete charImage;
         }
     } else {
         cout << "error" << endl;

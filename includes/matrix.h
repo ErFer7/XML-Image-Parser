@@ -35,7 +35,9 @@ structures::Matrix<T>::Matrix(int width, int height) {
 }
 
 template <typename T>
-structures::Matrix<T>::~Matrix() { delete[] _contents; }
+structures::Matrix<T>::~Matrix() {
+    delete[] _contents;
+}
 
 template <typename T>
 void structures::Matrix<T>::set_data(std::size_t i, const T &data) {
@@ -65,12 +67,18 @@ T structures::Matrix<T>::get_data(int x, int y) {
 }
 
 template <typename T>
-int structures::Matrix<T>::width() { return _width; }
+int structures::Matrix<T>::width() {
+    return _width;
+}
 
 template <typename T>
-int structures::Matrix<T>::height() { return _height; }
+int structures::Matrix<T>::height() {
+    return _height;
+}
 
 template <typename T>
-unsigned int structures::Matrix<T>::length() { return (unsigned int)(width() * height()); }
+unsigned int structures::Matrix<T>::length() {
+    return (unsigned int)(width() * height());
+}
 
 #endif

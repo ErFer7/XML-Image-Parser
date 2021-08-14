@@ -31,6 +31,8 @@ class CharImage : Matrix<char> {
 
 }  // namespace structures
 
+structures::CharImage::~CharImage() {}
+
 void structures::CharImage::set_image(const std::string &image) {
     if (image.length() == length()) {
         for (std::size_t i = 0; i < image.length(); ++i) {
