@@ -18,7 +18,7 @@ using structures::Matrix;
 
 #define STACK_SIZE 10
 
-// v0.6
+// v0.6.1
 
 int main() {
     char xmlFileName[100];
@@ -35,7 +35,6 @@ int main() {
     xmlFile.open(xmlFileName);
 
     if (xmlFile.is_open()) {
-        string line;
         string tag;
         string data;
         string imgName;
