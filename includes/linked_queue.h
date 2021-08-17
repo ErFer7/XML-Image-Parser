@@ -1,32 +1,26 @@
-//! Copyright [2021] <Eric Fernandes Evaristo>
+// Copyright [2021] <Eric Fernandes Evaristo>
+// Versão: 1.0
+
 #ifndef STRUCTURES_LINKED_QUEUE_H
 #define STRUCTURES_LINKED_QUEUE_H
 
-#include <cstdint>
-#include <stdexcept>
+#include <cstdint>    // std::size_t
+#include <stdexcept>  // C++ exceptions
 
 namespace structures {
 
 template <typename T>
 class LinkedQueue {
    public:
-    LinkedQueue();
-
-    ~LinkedQueue();
-
-    void clear();  // limpar
-
-    void enqueue(const T& data);  // enfilerar
-
-    T dequeue();  // desenfilerar
-
-    T& front() const;  // primeiro dado
-
-    T& back() const;  // último dado
-
-    bool empty() const;  // fila vazia
-
-    std::size_t size() const;  // tamanho
+    LinkedQueue();                // Construtor
+    ~LinkedQueue();               // Destrutor
+    void clear();                 // Limpar
+    void enqueue(const T& data);  // Enfilerar
+    T dequeue();                  // Desenfilerar
+    T& front() const;             // Primeiro dado
+    T& back() const;              // Último dado
+    bool empty() const;           // Fila vazia
+    std::size_t size() const;     // Tamanho
 
    private:
     class Node {  // Elemento
@@ -70,6 +64,9 @@ class LinkedQueue {
 
 }  // namespace structures
 
+/**
+ * Constrói um novo objeto structures::Linked Queue<T>::Linked Queue
+ */
 template <typename T>
 structures::LinkedQueue<T>::LinkedQueue() {
     // Inicializa os atributos
@@ -78,12 +75,18 @@ structures::LinkedQueue<T>::LinkedQueue() {
     size_ = 0u;
 }
 
+/**
+ * Destrói o objeto structures::Linked Queue<T>::Linked Queue
+ */
 template <typename T>
 structures::LinkedQueue<T>::~LinkedQueue() {
     // Limpa a lista
     clear();
 }
 
+/**
+ * Limpa a fila, removendo todos os dados.
+ */
 template <typename T>
 void structures::LinkedQueue<T>::clear() {
     // Enquanto o tamanho não for 0 desenfilera
@@ -92,6 +95,11 @@ void structures::LinkedQueue<T>::clear() {
     }
 }
 
+/**
+ * Enfileira os dados.
+ *      Parâmetros:
+ *          data: Dado do tipo generico T a ser enfileirado
+ */
 template <typename T>
 void structures::LinkedQueue<T>::enqueue(const T& data) {
     // Cria um nó com o dado
@@ -116,6 +124,9 @@ void structures::LinkedQueue<T>::enqueue(const T& data) {
     }
 }
 
+/**
+ * Desenfileira dados retornando o dado removido da fila.
+ */
 template <typename T>
 T structures::LinkedQueue<T>::dequeue() {
     // Variável para o dado
@@ -140,6 +151,9 @@ T structures::LinkedQueue<T>::dequeue() {
     return data;
 }
 
+/**
+ * Retorna o dado do tipo T no início da fila.
+ */
 template <typename T>
 T& structures::LinkedQueue<T>::front() const {
     // Ponteiro para o dado
@@ -157,6 +171,9 @@ T& structures::LinkedQueue<T>::front() const {
     return *data;
 }
 
+/**
+ * Retorna o dado do tipo T no fim da fila.
+ */
 template <typename T>
 T& structures::LinkedQueue<T>::back() const {
     // Ponteiro para o dado
@@ -174,15 +191,19 @@ T& structures::LinkedQueue<T>::back() const {
     return *data;
 }
 
+/**
+ * Retorna verdadeiro caso o tamanho seja 0 e falso caso contrário.
+ */
 template <typename T>
 bool structures::LinkedQueue<T>::empty() const {
-    // Retorna verdadeiro caso o tamanho seja 0 e falso caso contrário
     return size() == 0;
 }
 
+/**
+ * Retorna o tamanho da fila com o tipo std::size_t.
+ */
 template <typename T>
 std::size_t structures::LinkedQueue<T>::size() const {
-    // Retorna o tamanho
     return size_;
 }
 
