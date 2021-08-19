@@ -1,5 +1,5 @@
 // Copyright [2021] <Eric Fernandes Evaristo>
-// Versão: 1.0
+// Versão: 1.0.1
 
 #include <array_stack.h>
 #include <image.h>

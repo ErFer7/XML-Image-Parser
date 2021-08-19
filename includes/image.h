@@ -91,7 +91,7 @@ int structures::CharImage::height() { return Matrix<char>::height(); }
  * Retorna o tamanho da imagem (largura x altura).
  */
 unsigned int structures::CharImage::length() {
-    return (unsigned int)(Matrix<char>::width() * Matrix<char>::height());
+    return (unsigned int)(Matrix<char>::length());
 }
 
 #endif
